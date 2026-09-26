@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sathvik Vemulapalli: Admin</title>
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        body, html {
+            height: 100%; width: 100%; margin: 0;
+            display: flex; justify-content: center; align-items: center;
+            font-family: 'Arial', sans-serif;
+        }
+        form {
+            display: flex; flex-direction: column; gap: 12px;
+            width: 260px;
+        }
+        input {
+            padding: 10px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--form-border-color);
+            background: var(--form-bg-color);
+            color: var(--text-color);
+        }
+        button {
+            padding: 10px 12px;
+            border-radius: 6px;
+            border: none;
+            background: var(--button-bg-color);
+            color: white;
+            cursor: pointer;
+        }
+        button:hover { background: var(--button-hover-bg-color); }
+    </style>
+</head>
+<body>
+    <main>
+        <h2 style="margin-bottom:20px;">Admin</h2>
+        <% if (error) { %><div style="color:#e74c3c;font-size:13px;margin-bottom:10px;text-align:center;"><%- error %></div><% } %>
+        <form method="POST" action="/admin/login">
+            <input type="password" name="password" placeholder="Admin password" autocomplete="current-password" autofocus>
+            <button type="submit">Enter</button>
+        </form>
+    </main>
+</body>
+</html>

@@ -1,0 +1,268 @@
+<!--
+    Downloads page
+    Displays a list of apps with GitHub releases, allowing users to download the latest release assets.
+    The page detects the user's OS and highlights recommended downloads accordingly.
+    The page fetches data from the backend API endpoints:
+    - /api/downloads: Returns a list of apps with GitHub links.
+    - /api/releases/:owner/:repo: Returns the latest release info for a given GitHub repository.
+-->
+
+<!-- Styles -->
+<style>
+    /*OS Badge Styles*/
+    .os-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 14px;
+        border: 1px solid var(--form-border-color);
+        border-radius: 20px;
+        font-size: 0.82rem;
+        opacity: 0.7;
+        margin-top: 8px;
+    }
+
+    /* Downloads List Styles */
+    .downloads-list {
+        max-width: 860px;
+        margin: 32px auto;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    /* App Section Styles */
+    .app-section {
+        background: var(--form-bg-color);
+        border: 1px solid var(--form-border-color);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    .app-section-header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 18px 22px 22px;
+        border-bottom: 1px solid var(--form-border-color);
+    }
+    .app-section-header ion-icon { font-size: 1.6rem; }
+    .app-section-header .app-name { font-weight: 700; font-size: 1rem; color: var(--heading-color); }
+    .app-section-header .app-desc { font-size: 0.82rem; opacity: 0.65; }
+    .app-section-header .release-tag {
+        margin-left: auto;
+        font-size: 0.75rem;
+        opacity: 0.5;
+        white-space: nowrap;
+    }
+
+    /* Release Asset List Styles */
+    .assets-list {
+        padding: 12px 0;
+    }
+    .asset-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 22px;
+        transition: background 0.12s;
+        text-decoration: none;
+        color: var(--text-color);
+    }
+    .asset-row:hover { background: var(--code-bg-color); text-decoration: none; }
+    .asset-row.recommended {
+        background: rgba(140, 136, 243, 0.08);
+        border-left: 3px solid var(--link-color);
+        padding-left: 19px;
+    }
+    .asset-row.recommended:hover { background: rgba(140, 136, 243, 0.14); }
+
+    .asset-os-icon { font-size: 1.2rem; flex-shrink: 0; opacity: 0.7; }
+    .asset-name { flex: 1; font-size: 0.88rem; font-family: monospace; word-break: break-all; }
+    .asset-size { font-size: 0.78rem; opacity: 0.5; white-space: nowrap; }
+    .asset-badge {
+        font-size: 0.7rem;
+        padding: 2px 8px;
+        border-radius: 10px;
+        background: var(--link-color);
+        color: white;
+        white-space: nowrap;
+    }
+    .asset-dl-icon { font-size: 1.1rem; color: var(--link-color); flex-shrink: 0; }
+
+    /* App Links Styles */
+    .app-links {
+        display: flex;
+        border-top: 1px solid var(--form-border-color);
+    }
+    .app-github-link, .app-site-link {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 22px;
+        font-size: 0.82rem;
+        color: var(--link-color);
+        text-decoration: none;
+    }
+    .app-github-link:hover, .app-site-link:hover { text-decoration: underline; }
+
+    /* No Releases / Empty State Styles */
+    .no-releases {
+        padding: 16px 22px;
+        font-size: 0.85rem;
+        opacity: 0.5;
+    }
+
+    .empty-state {
+        text-align: center;
+        opacity: 0.5;
+        padding: 60px 0;
+    }
+
+    /* Responsive Styling */
+    @media (max-width: 600px) {
+        .asset-size { display: none; }
+        .app-section-header .release-tag { display: none; }
+    }
+</style>
+
+<!-- Page Content -->
+
+<!-- Page Header -->
+<div style="max-width:860px;margin:24px auto 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+    <p style="margin:0;opacity:0.7;font-size:0.92rem;">Latest releases pulled live from GitHub.</p>
+    <div class="os-badge">
+        <ion-icon id="osIcon" name="desktop-outline"></ion-icon>
+        <span id="osLabel">Detecting your OS…</span>
+    </div>
+</div>
+
+<!-- Downloads List -->
+<div class="downloads-list" id="downloadsList">
+    <div style="text-align:center; opacity:0.5; padding:40px 0;">Loading…</div>
+</div>
+
+<!-- Scripts -->
+<script>
+    // Detect the user's OS and update the badge accordingly
+    const detectedOS = '<%- detectedOS %>';
+
+    const osIconMap = {
+        windows: 'logo-windows',
+        mac: 'logo-apple',
+        linux: 'logo-tux'
+    };
+    const osLabelMap = {
+        windows: 'Windows detected',
+        mac: 'macOS detected',
+        linux: 'Linux detected',
+        unknown: 'OS unknown'
+    };
+    const osIconEl = document.getElementById('osIcon');
+    const osLabelEl = document.getElementById('osLabel');
+    osIconEl.name = osIconMap[detectedOS] || 'desktop-outline';
+    osLabelEl.textContent = osLabelMap[detectedOS] || 'OS unknown';
+
+    function assetOsIcon(name) {
+        const n = name.toLowerCase();
+        if (n.includes('windows') || n.includes('win') || n.includes('.exe') || n.includes('setup')) return 'logo-windows';
+        if (n.includes('macos') || n.includes('mac') || n.includes('darwin') || n.includes('.dmg')) return 'logo-apple';
+        if (n.includes('linux') || n.includes('.appimage') || n.includes('.deb') || n.includes('.rpm')) return 'logo-tux';
+        return 'document-outline';
+    }
+
+    function assetOS(name) {
+        const n = name.toLowerCase();
+        if (n.includes('windows') || n.includes('win') || n.includes('.exe') || n.includes('setup')) return 'windows';
+        if (n.includes('macos') || n.includes('mac') || n.includes('darwin') || n.includes('.dmg')) return 'mac';
+        if (n.includes('linux') || n.includes('.appimage') || n.includes('.deb') || n.includes('.rpm')) return 'linux';
+        return 'unknown';
+    }
+
+    // Format bytes into human-readable format (KB, MB)
+    function formatBytes(bytes) {
+        if (!bytes) return '';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(0) + ' KB';
+        return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+
+    // Load downloads from the API and render them
+    async function loadDownloads() {
+        const list = document.getElementById('downloadsList');
+        try {
+            // Fetch the list of downloadable apps from the backend API
+            const apps = await fetch('/api/downloads').then(r => r.json());
+            if (!apps.length) {
+                list.innerHTML = '<div class="empty-state">No downloadable apps found.</div>';
+                return;
+            }
+
+            // For each app, fetch the latest release info from GitHub
+            const sections = await Promise.all(apps.map(async function(app) {
+                const [owner, repo] = (app.github || '').split('/');
+                if (!owner || !repo) return { app, release: null };
+                const release = await fetch(`/api/releases/${owner}/${repo}`).then(r => r.json()).catch(() => null);
+                return { app, release };
+            }));
+
+            // Render the sections into HTML
+            list.innerHTML = sections.map(function({ app, release }) {
+                const color = app.color || 'var(--link-color)';
+                const icon = app.icon || 'globe-outline';
+                const desc = app.description || '';
+                const tagName = release ? release.tag_name : '';
+                const repoUrl = app.github ? `https://github.com/${app.github}` : '';
+                const siteUrl = app.link ? (/^https?:\/\//i.test(app.link) ? app.link : `https://${app.link}`) : '';
+
+                // Render the release assets into HTML
+                let assetsHtml = '';
+                if (release && release.assets && release.assets.length) {
+                    assetsHtml = release.assets.map(function(asset) {
+                        const assetOs = assetOS(asset.name);
+                        const isRecommended = assetOs === detectedOS;
+                        return `<a href="${asset.browser_download_url}" class="asset-row${isRecommended ? ' recommended' : ''}" download>
+                            <ion-icon class="asset-os-icon" name="${assetOsIcon(asset.name)}"></ion-icon>
+                            <span class="asset-name">${asset.name}</span>
+                            ${isRecommended ? '<span class="asset-badge">Recommended</span>' : ''}
+                            <span class="asset-size">${formatBytes(asset.size)}</span>
+                            <ion-icon class="asset-dl-icon" name="cloud-download-outline"></ion-icon>
+                        </a>`;
+                    }).join('');
+                } else {
+                    assetsHtml = '<div class="no-releases">No release assets available yet.</div>';
+                }
+
+                // Render the site and GitHub links into HTML
+                const siteLink = siteUrl ? `
+                    <a href="${siteUrl}" class="app-site-link" target="_blank" rel="noopener">
+                        <ion-icon name="globe-outline"></ion-icon> Visit site
+                    </a>` : '';
+
+                const githubLink = repoUrl ? `
+                    <a href="${repoUrl}" class="app-github-link" target="_blank" rel="noopener">
+                        <ion-icon name="logo-github"></ion-icon> View on GitHub
+                        ${tagName ? `<span style="opacity:0.5;margin-left:4px;">· ${tagName}</span>` : ''}
+                    </a>` : '';
+
+                // Return the complete HTML for this app section
+                return `<div class="app-section">
+                    <div class="app-section-header">
+                        <ion-icon name="${icon}" style="color:${color};"></ion-icon>
+                        <div>
+                            <div class="app-name">${app.site_name || 'App'}</div>
+                            ${desc ? `<div class="app-desc">${desc}</div>` : ''}
+                        </div>
+                        ${tagName ? `<span class="release-tag">${tagName}</span>` : ''}
+                    </div>
+                    <div class="assets-list">${assetsHtml}</div>
+                    ${(siteLink || githubLink) ? `<div class="app-links">${siteLink}${githubLink}</div>` : ''}
+                </div>`;
+            }).join('');
+
+        } catch(e) { // If any error occurs while fetching or rendering, show an error message
+            list.innerHTML = '<div class="empty-state">Could not load downloads. Please try again later.</div>';
+        }
+    }
+
+    // Initial load of downloads when the page is ready
+    loadDownloads();
+</script>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sathvik Vemulapalli: Admin</title>
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        body { font-family: 'Arial', sans-serif; }
+        main { max-width: 720px; margin: 0 auto; padding: 40px 20px 80px; }
+        .admin-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 24px;
+        }
+        .admin-header a { font-size: 0.85rem; }
+
+        .panel {
+            background: var(--form-bg-color);
+            border: 1px solid var(--form-border-color);
+            border-radius: 12px;
+            padding: 20px 22px;
+            margin-bottom: 28px;
+        }
+        .panel h3 { text-align: left; margin: 0 0 16px; }
+
+        form.grant-form { display: flex; gap: 10px; flex-wrap: wrap; }
+        form.grant-form input, form.grant-form select {
+            padding: 9px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--form-border-color);
+            background: var(--background-color);
+            color: var(--text-color);
+            flex: 1;
+            min-width: 160px;
+        }
+        form.grant-form button {
+            padding: 9px 16px;
+            border-radius: 6px;
+            border: none;
+            background: var(--button-bg-color);
+            color: white;
+            cursor: pointer;
+        }
+        form.grant-form button:hover { background: var(--button-hover-bg-color); }
+
+        .notice { font-size: 0.85rem; margin-bottom: 16px; padding: 10px 14px; border-radius: 8px; }
+        .notice.error { background: rgba(231,76,60,0.15); color: #e74c3c; }
+        .notice.success { background: rgba(46,204,113,0.15); color: #2ecc71; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+        th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--form-border-color); }
+        th { opacity: 0.6; font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        .revoke-btn {
+            padding: 4px 10px; font-size: 0.78rem;
+            border-radius: 6px; border: 1px solid var(--form-border-color);
+            background: transparent; color: var(--text-color); cursor: pointer;
+        }
+        .revoke-btn:hover { background: var(--code-bg-color); }
+        .empty-row { opacity: 0.5; text-align: center; padding: 16px 0; }
+
+        .site-beta-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--form-border-color); }
+        .site-beta-row:last-child { border-bottom: none; }
+        .site-beta-name { font-size: 0.9rem; }
+        .beta-toggle-btn {
+            padding: 4px 12px; font-size: 0.78rem;
+            border-radius: 12px; border: 1px solid var(--form-border-color);
+            cursor: pointer;
+        }
+        .beta-toggle-btn.on { background: var(--button-bg-color); color: white; border-color: var(--button-bg-color); }
+        .beta-toggle-btn.off { background: transparent; color: var(--text-color); }
+    </style>
+</head>
+<body>
+    <main>
+        <div class="admin-header">
+            <h2 style="margin:0;">Beta Testing</h2>
+            <a href="/admin/logout">Log out</a>
+        </div>
+
+        <% if (error) { %><div class="notice error"><%- error %></div><% } %>
+        <% if (success) { %><div class="notice success"><%- success %></div><% } %>
+
+        <div class="panel">
+            <h3>Grant beta tester status</h3>
+            <p style="font-size:0.82rem; opacity:0.6; margin-top:-8px;">
+                Suite-wide, so the a beta tester can access any app currently in beta below.
+            </p>
+            <form class="grant-form" method="POST" action="/admin/beta-tester">
+                <input type="email" name="email" placeholder="User's email" required>
+                <button type="submit">Grant</button>
+            </form>
+        </div>
+
+        <div class="panel">
+            <h3>Current beta testers</h3>
+            <% if (!testers.length) { %>
+            <div class="empty-row">No beta testers yet.</div>
+            <% } else { %>
+            <table>
+                <thead>
+                    <tr><th>Name</th><th>Email</th><th></th></tr>
+                </thead>
+                <tbody>
+                    <% testers.forEach(function(t) { %>
+                    <tr>
+                        <td><%= t.name || 'N/A' %></td>
+                        <td><%= t.email %></td>
+                        <td>
+                            <form method="POST" action="/admin/beta-tester/<%= t._id %>/revoke" style="margin:0;">
+                                <button type="submit" class="revoke-btn">Revoke</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+            <% } %>
+        </div>
+
+        <div class="panel">
+            <h3>Apps in beta</h3>
+            <p style="font-size:0.82rem; opacity:0.6; margin-top:-8px;">
+                Toggle whether each app is currently gated to beta testers only.
+            </p>
+            <% if (!sites.length) { %>
+            <div class="empty-row">No websites found.</div>
+            <% } else { %>
+            <% sites.forEach(function(s) { %>
+            <div class="site-beta-row">
+                <span class="site-beta-name"><%= s.site_name %></span>
+                <form method="POST" action="/admin/website-beta/<%= s._id %>/toggle" style="margin:0;">
+                    <button type="submit" class="beta-toggle-btn <%= s.beta ? 'on' : 'off' %>">
+                        <%= s.beta ? 'In beta' : 'Public' %>
+                    </button>
+                </form>
+            </div>
+            <% }); %>
+            <% } %>
+        </div>
+    </main>
+</body>
+</html>

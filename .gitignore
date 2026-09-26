@@ -1,0 +1,5 @@
+node_modules/
+.env
+dist/
+RELEASE.md
+beta-instructions.md

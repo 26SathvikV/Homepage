@@ -1,0 +1,370 @@
+<!--
+    Plans Page
+    This page displays the subscription plans and features for the application.
+    Not currently active, but will be used for future monetization or subscription options if current resources are maxed out.
+-->
+
+<!-- Plans Page Styles -->
+<style>
+    /* Center the content and set a max width for readability */
+    .plans-wrap {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 32px 20px 80px;
+    }
+
+    /* Introduction Section Styles */
+    .plans-intro {
+        text-align: center;
+        margin-bottom: 48px;
+    }
+    .plans-intro p {
+        opacity: 0.7;
+        font-size: 0.95rem;
+        max-width: 480px;
+        margin: 0 auto;
+    }
+
+    /* Tiers Section Styles */
+    .tiers {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+
+    .tier-card {
+        background: var(--form-bg-color);
+        border: 1px solid var(--form-border-color);
+        border-radius: 14px;
+        padding: 28px 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+    .tier-card.featured {
+        border-color: var(--link-color);
+        box-shadow: 0 0 0 1px var(--link-color);
+    }
+
+    .tier-header { display: flex; align-items: center; gap: 10px; }
+    .tier-name { font-weight: 700; font-size: 1.05rem; color: var(--heading-color); }
+    .tier-badge {
+        font-size: 0.68rem;
+        padding: 2px 8px;
+        border-radius: 10px;
+        background: var(--link-color);
+        color: white;
+        font-weight: 600;
+    }
+
+    .tier-price {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--heading-color);
+        line-height: 1;
+    }
+    .tier-price span { font-size: 0.85rem; font-weight: 400; opacity: 0.55; }
+
+    .tier-divider { border: none; border-top: 1px solid var(--form-border-color); margin: 0; }
+
+    .tier-features {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        font-size: 0.88rem;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        flex: 1;
+    }
+    .tier-features li {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        line-height: 1.45;
+    }
+    .tier-features li ion-icon { color: var(--link-color); font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+    .tier-features li.unavailable { opacity: 0.35; }
+    .tier-features li.unavailable ion-icon { color: var(--text-color); }
+
+    /* Call-to-Action Button Styles */
+    .tier-cta {
+        display: block;
+        text-align: center;
+        padding: 10px 0;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background 0.15s;
+        background: var(--button-bg-color);
+        color: white;
+        border: none;
+        cursor: pointer;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .tier-cta:hover { background: var(--button-hover-bg-color); text-decoration: none; }
+    .tier-cta.outline {
+        background: transparent;
+        border: 1px solid var(--form-border-color);
+        color: var(--text-color);
+    }
+    .tier-cta.outline:hover { background: var(--code-bg-color); }
+
+    /* App feature sections */
+    .app-sections {
+        display: flex;
+        flex-direction: column;
+        gap: 48px;
+        margin-top: 56px;
+    }
+    .app-section-head {
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+        margin-bottom: 14px;
+    }
+    .app-section-name { font-size: 1rem; font-weight: 700; color: var(--heading-color); }
+    .app-section-desc { font-size: 0.82rem; opacity: 0.5; }
+
+    /* Feature table styles */
+    .table-wrap {
+        overflow-x: auto;
+        border: 1px solid var(--form-border-color);
+        border-radius: 10px;
+    }
+    .feature-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.87rem;
+        min-width: 480px;
+    }
+    .feature-table thead th {
+        padding: 11px 16px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.8rem;
+        background: var(--form-bg-color);
+        border-bottom: 1px solid var(--form-border-color);
+        white-space: nowrap;
+    }
+    .feature-table thead th:not(:first-child) { text-align: center; min-width: 80px; }
+    .feature-table td {
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--form-border-color);
+        vertical-align: middle;
+        line-height: 1.4;
+    }
+    .feature-table td:not(:first-child) { text-align: center; white-space: nowrap; }
+    .feature-table tbody tr:last-child td { border-bottom: none; }
+    .feature-table tbody tr:hover { background: var(--form-bg-color); }
+    .feat-yes { color: var(--link-color); font-weight: 700; }
+    .feat-no  { opacity: 0.25; }
+    .feat-val { font-weight: 500; }
+
+    /* Responsive adjustments for smaller screens */
+    @media (max-width: 700px) {
+        .tiers { grid-template-columns: 1fr; }
+    }
+
+    /* Notice for when monetization is hidden */
+    .monetization-hidden-notice {
+        text-align: center;
+        max-width: 480px;
+        margin: 0 auto 48px;
+        padding: 20px 24px;
+        border: 1px solid var(--form-border-color);
+        border-radius: 14px;
+        background: var(--form-bg-color);
+        color: var(--text-color);
+        font-size: 0.92rem;
+    }
+</style>
+
+<!-- Plans Page Content -->
+<div class="plans-wrap">
+    <div class="plans-intro">
+        <p>One subscription covers the whole suite, with benefits provided as written below.</p>
+    </div>
+
+    <% if (typeof monetizationHidden !== 'undefined' && monetizationHidden) { %>
+    <div class="monetization-hidden-notice">
+        Paid plans are currently unavailable.
+    </div>
+    <% } else { %>
+    <div class="tiers">
+
+        <!-- Free -->
+        <div class="tier-card">
+            <div class="tier-header">
+                <div class="tier-name">Free</div>
+            </div>
+            <div class="tier-price">$0 <span>/ month</span></div>
+            <hr class="tier-divider">
+            <ul class="tier-features">
+                <li><ion-icon name="checkmark-outline"></ion-icon> All core features on every app</li>
+                <li><ion-icon name="checkmark-outline"></ion-icon> 5 EXE runs/day · 15 sessions</li>
+                <li><ion-icon name="checkmark-outline"></ion-icon> 100 MB storage</li>
+                <li class="unavailable"><ion-icon name="close-outline"></ion-icon> EPUB export & custom profile URL</li>
+                <li class="unavailable"><ion-icon name="close-outline"></ion-icon> Priority support</li>
+                <li class="unavailable"><ion-icon name="close-outline"></ion-icon> Team workspace & batch export</li>
+            </ul>
+            <a href="/signup" class="tier-cta outline">Get started</a>
+        </div>
+
+        <!-- Pro -->
+        <div class="tier-card featured">
+            <div class="tier-header">
+                <div class="tier-name">Pro</div>
+                <span class="tier-badge">Popular</span>
+            </div>
+            <div class="tier-price">$5 <span>/ month</span></div>
+            <hr class="tier-divider">
+            <ul class="tier-features">
+                <li><ion-icon name="checkmark-outline"></ion-icon> Everything in Free</li>
+                <li><ion-icon name="checkmark-outline"></ion-icon> 50 EXE runs/day · 100 sessions</li>
+                <li><ion-icon name="checkmark-outline"></ion-icon> 5 GB storage</li>
+                <li><ion-icon name="checkmark-outline"></ion-icon> EPUB export & custom profile URL</li>
+                <li><ion-icon name="checkmark-outline"></ion-icon> Priority support</li>
+                <li class="unavailable"><ion-icon name="close-outline"></ion-icon> Team workspace & batch export</li>
+            </ul>
+            <form method="POST" action="/billing/checkout" style="margin:0;">
+                <input type="hidden" name="plan" value="pro">
+                <button type="submit" class="tier-cta">Upgrade to Pro</button>
+            </form>
+        </div>
+
+        <!-- Studio -->
+        <div class="tier-card">
+            <div class="tier-header">
+                <div class="tier-name">Studio</div>
+            </div>
+            <div class="tier-price">$<!-- TODO --> <span>/ month</span></div>
+            <hr class="tier-divider">
+            <ul class="tier-features">
+                <li><ion-icon name="checkmark-outline"></ion-icon> Everything in Pro</li>
+                <li><ion-icon name="checkmark-outline"></ion-icon> Unlimited EXE runs & sessions</li>
+                <li><ion-icon name="checkmark-outline"></ion-icon> 100 GB storage</li>
+                <li><ion-icon name="checkmark-outline"></ion-icon> Team workspace (Catalogue)</li>
+                <li><ion-icon name="checkmark-outline"></ion-icon> Batch & mass export (Catalogue)</li>
+                <li><ion-icon name="checkmark-outline"></ion-icon> Early feature access</li>
+            </ul>
+            <form method="POST" action="/billing/checkout" style="margin:0;">
+                <input type="hidden" name="plan" value="studio">
+                <button type="submit" class="tier-cta">Upgrade to Studio</button>
+            </form>
+        </div>
+
+    </div>
+    <% } %>
+
+    <!-- Feature Comparison -->
+    <%
+    var _visible = typeof visibleSiteNames !== 'undefined' ? visibleSiteNames : null;
+    function siteVisible(name) { return !_visible || _visible.has(name); }
+    %>
+
+    <div class="app-sections">
+
+        <!-- Catalogue -->
+        <% if (siteVisible('Catalogue')) { %>
+        <div class="app-section">
+            <div class="app-section-head">
+                <div class="app-section-name">Catalogue</div>
+                <div class="app-section-desc">Document workspace &amp; collaboration</div>
+            </div>
+            <div class="table-wrap">
+                <table class="feature-table">
+                    <thead>
+                        <tr><th>Feature</th><th>Free</th><th>Pro</th><th>Studio</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Collaborators / project</td><td class="feat-val">10</td><td class="feat-val">20</td><td class="feat-val">∞</td></tr>
+                        <tr><td>Canvas cards / project</td><td class="feat-val">50</td><td class="feat-val">500</td><td class="feat-val">∞</td></tr>
+                        <tr><td>Snapshots / doc section</td><td class="feat-val">5</td><td class="feat-val">50</td><td class="feat-val">∞</td></tr>
+                        <tr><td>Storage</td><td class="feat-val">100 MB</td><td class="feat-val">5 GB</td><td class="feat-val">100 GB</td></tr>
+                        <tr><td>EPUB export</td><td class="feat-no">✗</td><td class="feat-yes">✓</td><td class="feat-yes">✓</td></tr>
+                        <tr><td>Custom profile URL</td><td class="feat-no">✗</td><td class="feat-yes">✓</td><td class="feat-yes">✓</td></tr>
+                        <tr><td>Team workspace</td><td class="feat-no">✗</td><td class="feat-no">✗</td><td class="feat-yes">✓</td></tr>
+                        <tr><td>Batch / mass export</td><td class="feat-no">✗</td><td class="feat-no">✗</td><td class="feat-yes">✓</td></tr>
+                        <tr><td>Priority support</td><td class="feat-no">✗</td><td class="feat-yes">✓</td><td class="feat-yes">✓</td></tr>
+                        <tr><td>Early feature access</td><td class="feat-no">✗</td><td class="feat-no">✗</td><td class="feat-yes">✓</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <% } %>
+
+        <!-- Serenity -->
+        <% if (siteVisible('Serenity')) { %>
+        <div class="app-section">
+            <div class="app-section-head">
+                <div class="app-section-name">Serenity</div>
+                <div class="app-section-desc">Focus sessions &amp; productivity</div>
+            </div>
+            <div class="table-wrap">
+                <table class="feature-table">
+                    <thead>
+                        <tr><th>Feature</th><th>Free</th><th>Pro</th><th>Studio</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Active sessions</td><td class="feat-val">15</td><td class="feat-val">100</td><td class="feat-val">∞</td></tr>
+                        <tr><td>Groups</td><td class="feat-val">5</td><td class="feat-val">20</td><td class="feat-val">∞</td></tr>
+                        <tr><td>Templates</td><td class="feat-val">5</td><td class="feat-val">30</td><td class="feat-val">∞</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <% } %>
+
+        <!-- Executor -->
+        <% if (siteVisible('Executor')) { %>
+        <div class="app-section">
+            <div class="app-section-head">
+                <div class="app-section-name">Executor</div>
+                <div class="app-section-desc">Windows executable analysis &amp; emulation</div>
+            </div>
+            <div class="table-wrap">
+                <table class="feature-table">
+                    <thead>
+                        <tr><th>Feature</th><th>Free / Guest</th><th>Pro</th><th>Studio</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>EXE runs / day</td><td class="feat-val">5</td><td class="feat-val">50</td><td class="feat-val">∞</td></tr>
+                        <tr><td>File conversions / day</td><td class="feat-val">20</td><td class="feat-val">200</td><td class="feat-val">∞</td></tr>
+                        <tr><td>Archive extractions / day</td><td class="feat-val">10</td><td class="feat-val">50</td><td class="feat-val">∞</td></tr>
+                        <tr><td>Tool operations / day</td><td class="feat-val">50</td><td class="feat-val">∞</td><td class="feat-val">∞</td></tr>
+                        <tr><td>VirusTotal lookups / day</td><td class="feat-val">3</td><td class="feat-val">∞</td><td class="feat-val">∞</td></tr>
+                        <tr><td>Run history entries</td><td class="feat-val">20 rolling</td><td class="feat-val">∞</td><td class="feat-val">∞</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <% } %>
+
+        <!-- Campfire -->
+        <% if (siteVisible('Campfire')) { %>
+        <div class="app-section">
+            <div class="app-section-head">
+                <div class="app-section-name">Campfire</div>
+                <div class="app-section-desc">Recipe aggregator &amp; meal planner</div>
+            </div>
+            <div class="table-wrap">
+                <table class="feature-table">
+                    <thead>
+                        <tr><th>Feature</th><th>Free</th><th>Pro</th><th>Studio</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Saved recipes</td><td class="feat-val">150</td><td class="feat-val">1,000</td><td class="feat-val">∞</td></tr>
+                        <tr><td>Custom recipes</td><td class="feat-val">75</td><td class="feat-val">500</td><td class="feat-val">∞</td></tr>
+                        <tr><td>Custom filter presets</td><td class="feat-val">5</td><td class="feat-val">25</td><td class="feat-val">∞</td></tr>
+                        <tr><td>Meal-plan scheduling window</td><td class="feat-val">14 days</td><td class="feat-val">90 days</td><td class="feat-val">∞</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <% } %>
+
+    </div>
+</div>

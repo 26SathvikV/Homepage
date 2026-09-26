@@ -1,0 +1,170 @@
+<!--
+    Tutoring Page 
+    This page provides information about my tutoring services to potential students.
+    No data needs to be brought in from the database, so it should work when the database is down.
+-->
+
+<!-- Tutoring Page Styles -->
+<style>
+    /* Center the content and set a max width for readability */
+    .tutoring-wrap {
+        max-width: 680px;
+        margin: 0 auto;
+        padding: 16px 20px 80px;
+    }
+
+    /* Introduction Section Styles */
+    .tutoring-wrap > p {
+        font-size: 1.1rem;
+        line-height: 1.75;
+        margin-bottom: 40px;
+        max-width: 580px;
+    }
+
+    /* Section Label Styles */
+    .section-label {
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        opacity: 0.45;
+        margin-bottom: 14px;
+    }
+
+    /* Qualifications List Styles */
+    .qual-list {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 40px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .qual-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        font-size: 0.93rem;
+        line-height: 1.5;
+    }
+    .qual-list li ion-icon {
+        color: var(--link-color);
+        font-size: 1.1rem;
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+
+    /* Subject Grid Styles */
+    .subject-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 40px;
+    }
+    .subject-chip {
+        padding: 5px 13px;
+        border: 1px solid var(--form-border-color);
+        border-radius: 14px;
+        font-size: 0.85rem;
+        background: var(--form-bg-color);
+        color: var(--text-color);
+    }
+
+    /* Booking Card Styles */
+    .booking-card {
+        background: var(--form-bg-color);
+        border: 1px solid var(--form-border-color);
+        border-radius: 12px;
+        padding: 28px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+    .booking-card p {
+        margin: 0;
+        font-size: 0.93rem;
+        opacity: 0.8;
+        line-height: 1.5;
+        max-width: 380px;
+    }
+    .booking-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 11px 22px;
+        background: var(--button-bg-color);
+        color: white;
+        border-radius: 8px;
+        font-size: 0.92rem;
+        font-weight: 600;
+        text-decoration: none;
+        white-space: nowrap;
+        transition: background 0.15s;
+        flex-shrink: 0;
+    }
+    .booking-btn:hover { background: var(--button-hover-bg-color); text-decoration: none; }
+
+    /* Responsive Styles */
+    @media (max-width: 600px) {
+        .tutoring-wrap { padding: 16px 16px 60px; }
+        .tutoring-wrap h1 { font-size: 1.9rem; }
+        .booking-card { flex-direction: column; align-items: flex-start; }
+    }
+</style>
+
+<!-- Tutoring Page Content -->
+<div class="tutoring-wrap">
+    <!-- Introduction Section -->
+    <p>
+        I work one-on-one with students on programming fundamentals, CS coursework, and exam prep.
+        I've taught through The Harker School, theCoderSchool, and Wyzant and worked with complete beginners
+        learning Scratch to students preparing for AP CS A.
+    </p>
+
+    <!-- Qualifications Section -->
+    <div class="section-label">Qualifications</div>
+    <ul class="qual-list">
+        <li>
+            <ion-icon name="school-outline"></ion-icon>
+            CS Teaching Assistant at The Harker School - led office hours and graded programming coursework
+        </li>
+        <li>
+            <ion-icon name="code-slash-outline"></ion-icon>
+            Coding Instructor at theCoderSchool - taught Python and Scratch to students of all ages
+        </li>
+        <li>
+            <ion-icon name="person-outline"></ion-icon>
+            Independent tutor on Wyzant - programming fundamentals and AP CS A
+        </li>
+    </ul>
+
+    <!-- Subjects Section -->
+    <div class="section-label">Subjects</div>
+    <div class="subject-grid">
+        <span class="subject-chip">Python</span>
+        <span class="subject-chip">Java</span>
+        <span class="subject-chip">JavaScript</span>
+        <span class="subject-chip">Scratch</span>
+        <span class="subject-chip">AP CS A</span>
+        <span class="subject-chip">Programming fundamentals</span>
+        <span class="subject-chip">Data structures</span>
+        <span class="subject-chip">Web development</span>
+    </div>
+
+    <!-- Booking Section -->
+    <div class="section-label">Book a session</div>
+    <div class="booking-card">
+        <p>Sessions are booked through Wyzant. You can view my profile, check availability, and message me directly before committing.</p>
+        <div style="display:flex;flex-direction:column;gap:10px;flex-shrink:0;">
+            <a href="https://www.wyzant.com/refer/tutor/89981843?utm_source=TREF&utm_campaign=GI&utm_content=TProfile&utm_medium=link"
+               class="booking-btn" target="_blank" rel="noopener">
+                <ion-icon name="calendar-outline"></ion-icon> Book on Wyzant
+            </a>
+            <a href="https://www.wyzant.com/Tutors/SathvikV" target="_blank" rel="noopener"
+               style="text-align:center;font-size:0.82rem;color:var(--link-color);">
+                View my profile
+            </a>
+        </div>
+    </div>
+</div>

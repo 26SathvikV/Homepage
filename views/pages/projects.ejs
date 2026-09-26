@@ -1,0 +1,219 @@
+<!--
+    Projects Page
+    This page is rendered server-side and does not use the SPA framework. It fetches project data from the backend API and renders it as a grid of cards. The "In Progress" section is also fetched from the backend and displayed if there are any in-progress projects.
+    The page uses CSS Grid for layout and includes responsive design for smaller screens.
+    The project cards include an icon, name, description, and a link to the project.
+ -->
+
+<!-- Project Styles -->
+<style>
+    /* Center the content and set a max width for readability */
+    .projects-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+        max-width: 960px;
+        margin: 32px auto;
+    }
+
+    /* Project Card Styles */
+    .project-card {
+        background: var(--form-bg-color);
+        border: 1px solid var(--form-border-color);
+        border-radius: 12px;
+        padding: 24px 22px;
+        text-decoration: none;
+        color: var(--text-color);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .project-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        text-decoration: none;
+    }
+
+    .project-card-top {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+    .project-icon-wrap {
+        width: 48px; height: 48px;
+        border-radius: 10px;
+        background: var(--code-bg-color);
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0;
+    }
+    .project-name {
+        font-weight: 700;
+        font-size: 1.05rem;
+        color: var(--heading-color);
+        transition: filter 0.2s;
+    }
+    .project-card:hover .project-name {
+        filter: brightness(0.75);
+    }
+    .project-description {
+        font-size: 0.88rem;
+        line-height: 1.55;
+        opacity: 0.8;
+        flex: 1;
+    }
+    .project-link {
+        font-size: 0.82rem;
+        color: var(--link-color);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-top: auto;
+    }
+
+    .projects-empty {
+        text-align: center;
+        opacity: 0.5;
+        padding: 60px 0;
+        font-size: 0.95rem;
+    }
+
+    /* Responsive Styles for Smaller Screens */
+    @media (max-width: 600px) {
+        .projects-grid { grid-template-columns: 1fr; }
+    }
+
+    /* In-progress Section Styles */
+    .in-progress-section {
+        max-width: 960px;
+        margin: 96px auto 32px;
+    }
+    .in-progress-label {
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        opacity: 0.4;
+        margin-bottom: 16px;
+    }
+    .in-progress-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+    }
+    .in-progress-card {
+        background: var(--form-bg-color);
+        border: 1px dashed var(--form-border-color);
+        border-radius: 12px;
+        padding: 24px 22px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        opacity: 0.65;
+    }
+    .in-progress-card-top {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+    .in-progress-badge {
+        font-size: 0.68rem;
+        padding: 2px 8px;
+        border-radius: 10px;
+        background: var(--form-border-color);
+        color: var(--text-color);
+        font-weight: 600;
+        margin-left: auto;
+        white-space: nowrap;
+    }
+
+    /* Responsive Styles for Smaller Screens */
+    @media (max-width: 600px) {
+        .in-progress-grid { grid-template-columns: 1fr; }
+    }
+</style>
+
+<!-- Projects Grid -->
+<div class="projects-grid" id="projectsGrid">
+    <div style="grid-column:1/-1; text-align:center; opacity:0.5; padding:40px 0;">Loading…</div>
+</div>
+
+<!-- In Progress Section -->
+<div class="in-progress-section" id="inProgressSection" style="display:none;">
+    <div class="in-progress-label">In Progress</div>
+    <div class="in-progress-grid" id="inProgressGrid"></div>
+</div>
+
+<!-- Scripts to Fetch and Render Projects -->
+<script>
+    // Fetch and Render Projects
+    (async function() {
+        const grid = document.getElementById('projectsGrid'); // Get the projects grid element
+        try {
+            // Fetch the list of projects from the backend API
+            const projects = await fetch('/api/projects').then(r => r.json());
+            if (!projects.length) {
+                grid.innerHTML = '<div class="projects-empty">No projects listed yet.</div>';
+                return;
+            }
+
+            // Map each project to an HTML card and join them into a single string
+            grid.innerHTML = projects.map(function(p) {
+                const href = /^https?:\/\//i.test(p.link || '') ? p.link : 'https://' + (p.link || '#');
+                const desc = p.description || 'Visit this project to learn more.';
+                const icon = p.icon || 'globe-outline';
+                const color = p.color || 'var(--link-color)';
+                const titleColor = p.title_color ? `color:${p.title_color}` : '';
+                return `
+                    <a href="${href}" class="project-card" target="_blank" rel="noopener">
+                        <div class="project-card-top">
+                            <div class="project-icon-wrap">
+                                <ion-icon name="${icon}" style="color:${color};font-size:1.8rem;"></ion-icon>
+                            </div>
+                            <div class="project-name" style="${titleColor}">${p.site_name || 'Untitled'}</div>
+                        </div>
+                        <div class="project-description">${desc}</div>
+                        <div class="project-link">
+                            <ion-icon name="open-outline"></ion-icon> Open
+                        </div>
+                    </a>`;
+            }).join('');
+        } catch(e) {
+            grid.innerHTML = '<div class="projects-empty">Could not load projects.</div>';
+        }
+    })();
+
+    // Fetch and Render In Progress Projects
+    (async function() {
+        // Get the in-progress section and grid elements
+        const section = document.getElementById('inProgressSection');
+        const grid = document.getElementById('inProgressGrid');
+
+        try {
+            // Fetch the list of in-progress projects from the backend API
+            const projects = await fetch('/api/projects/in-progress').then(r => r.json());
+            if (!projects.length) return;
+
+            // Map each in-progress project to an HTML card and join them into a single string
+            grid.innerHTML = projects.map(function(p) {
+                const desc = p.description || 'Details coming soon.';
+                const icon = p.icon || 'construct-outline';
+                const color = p.color || 'var(--link-color)';
+                const titleColor = p.title_color ? `color:${p.title_color}` : '';
+                return `
+                    <div class="in-progress-card">
+                        <div class="in-progress-card-top">
+                            <div class="project-icon-wrap">
+                                <ion-icon name="${icon}" style="color:${color};font-size:1.8rem;"></ion-icon>
+                            </div>
+                            <div class="project-name" style="${titleColor}">${p.site_name || 'Untitled'}</div>
+                            <span class="in-progress-badge">In progress</span>
+                        </div>
+                        <div class="project-description">${desc}</div>
+                    </div>`;
+            }).join('');
+            section.style.display = '';
+        } catch(e) {
+            // Silently omit the section if it fails to load
+        }
+    })();
+</script>

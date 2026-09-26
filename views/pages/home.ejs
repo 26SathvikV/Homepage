@@ -1,0 +1,218 @@
+<!--
+    Home Page
+    Display a brief introduction, social links, and a list of projects and experience.
+    The page fetches project data from the backend API and renders it dynamically.
+ -->
+
+<!-- Home Page Styles -->
+<style>
+    /* Center the content and set a max width for readability */
+    .home-wrap {
+        max-width: 740px;
+        margin: 0 auto;
+        padding: 16px 20px 80px;
+    }
+
+    /* Introduction Section Styles */
+    .home-intro h1 {
+        font-size: 2.4rem;
+        text-align: left;
+        margin-bottom: 16px;
+        color: var(--heading-color);
+        font-family: var(--h1-font-family);
+    }
+    .home-intro p {
+        font-size: 1.05rem;
+        line-height: 1.7;
+        opacity: 0.85;
+        margin-bottom: 28px;
+    }
+
+    /* Social Links Styles */
+    .social-links {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+    }
+    .social-links a {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 16px;
+        border: 1px solid var(--form-border-color);
+        border-radius: 7px;
+        font-size: 0.88rem;
+        color: var(--text-color);
+        transition: background 0.12s, opacity 0.12s;
+        text-decoration: none;
+    }
+    .social-links a:hover { background: var(--form-bg-color); text-decoration: none; }
+    .social-links ion-icon { font-size: 1rem; color: var(--link-color); }
+
+    /* Tutoring Link Styles */
+    .tutoring-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 32px;
+        border: 1px solid var(--form-border-color);
+        border-radius: 7px;
+        font-size: 0.88rem;
+        color: var(--text-color);
+        transition: background 0.12s;
+        text-decoration: none;
+    }
+    .tutoring-link:hover { background: var(--form-bg-color); text-decoration: none; }
+    .tutoring-link ion-icon { font-size: 1rem; color: var(--link-color); }
+
+    /* Section Label Styles */
+    .section-label {
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        opacity: 0.45;
+        margin-bottom: 16px;
+    }
+
+    /* Project Row Styles */
+    .project-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 14px;
+        margin-bottom: 56px;
+    }
+    .project-pill {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 14px;
+        background: var(--form-bg-color);
+        border: 1px solid var(--form-border-color);
+        border-radius: 10px;
+        text-decoration: none;
+        color: var(--text-color);
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .project-pill:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+        text-decoration: none;
+    }
+    .project-pill ion-icon { font-size: 1.25rem; flex-shrink: 0; }
+
+    /* Experience List Styles */
+    .exp-list {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        margin-bottom: 56px;
+    }
+    .exp-item {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+    .exp-role {
+        font-size: 0.92rem;
+        font-weight: 600;
+    }
+    .exp-meta {
+        font-size: 0.82rem;
+        opacity: 0.5;
+    }
+
+    /* Responsive Styles for Smaller Screens */
+    @media (max-width: 600px) {
+        .home-wrap { padding: 40px 16px 60px; }
+        .home-intro h1 { font-size: 1.9rem; }
+        .project-row { grid-template-columns: 1fr 1fr; }
+    }
+</style>
+
+<!-- Home Page Content -->
+
+<div class="home-wrap">
+    <!-- Introduction Section -->
+    <div class="home-intro">
+        <h1>About Me</h1>
+        <p>
+            I'm a CS student at UC Santa Cruz with hands-on experience shipping production software.
+            I build full-stack web applications and applied AI tools, from transformer-based
+            pipelines and RAG systems to everyday platform work.
+            I also teach CS, which keeps me sharp at breaking down complex systems clearly.
+        </p>
+        <p style="margin-top: -20px;">
+            Open to Summer 2027 software engineering internships.
+        </p>
+        <a href="/tutoring" class="tutoring-link">
+            <ion-icon name="school-outline"></ion-icon> Tutoring
+        </a>
+        <div class="social-links" style="margin-top: 16px; margin-bottom: 68px;">
+            <a href="mailto:sathvikvemulapalli.contact@gmail.com">
+                <ion-icon name="mail-outline"></ion-icon> Email
+            </a>
+            <a href="https://github.com/26SathvikV" target="_blank" rel="noopener">
+                <ion-icon name="logo-github"></ion-icon> GitHub
+            </a>
+            <a href="https://linkedin.com/in/sathvik-vemulapalli" target="_blank" rel="noopener">
+                <ion-icon name="logo-linkedin"></ion-icon> LinkedIn
+            </a>
+        </div>
+    </div>
+
+    <!-- Projects Section -->
+    <div class="section-label">Projects</div>
+    <div class="project-row" id="homeProjectRow">
+        <div style="opacity:0.4; font-size:0.85rem; grid-column:1/-1; padding:8px 0;">Loading…</div>
+    </div>
+
+    <!-- Experience Section -->
+    <div class="section-label">Experience</div>
+    <div class="exp-list">
+        <div class="exp-item">
+            <div class="exp-role">B.S. Computer Science · UC Santa Cruz</div>
+            <div class="exp-meta">2026 – present</div>
+        </div>
+        <div class="exp-item">
+            <div class="exp-role">Software Engineering Intern · PurpleTalk</div>
+            <div class="exp-meta">Created products for users, such as an AI diagnostic tool and study helper for teachers and students · 2026</div>
+        </div>
+        <div class="exp-item">
+            <div class="exp-role">Teaching Assistant · The Harker School</div>
+            <div class="exp-meta">Led CS office hours and graded programming coursework · 2025</div>
+        </div>
+        <div class="exp-item">
+            <div class="exp-role">Coding Instructor · theCoderSchool</div>
+            <div class="exp-meta">Taught Python and Scratch to students of all ages · 2025 – 2026</div>
+        </div>
+    </div>
+</div>
+
+<!-- Home Page Scripts -->
+<script>
+    // Fetch and render the list of projects from the backend API
+    (async function() {
+        const row = document.getElementById('homeProjectRow');
+        try {
+            const resp = await fetch('/api/projects');
+            if (!resp.ok) throw new Error(resp.status);
+            const projects = await resp.json();
+            if (!projects.length) {
+                row.innerHTML = '<span style="opacity:0.4;font-size:0.85rem;grid-column:1/-1;padding:8px 0">No projects yet.</span>';
+                return;
+            }
+            row.innerHTML = projects.map(function(p) {
+                const href = /^https?:\/\//i.test(p.link || '') ? p.link : 'https://' + (p.link || '#');
+                return `<a href="${href}" class="project-pill" target="_blank" rel="noopener">
+                    <ion-icon name="${p.icon || 'globe-outline'}" style="color:${p.color || 'var(--link-color)'}"></ion-icon>
+                    ${p.site_name || 'Project'}
+                </a>`;
+            }).join('');
+        } catch(e) {
+            row.innerHTML = '<span style="opacity:0.4;font-size:0.85rem;grid-column:1/-1;padding:8px 0">Could not load projects.</span>';
+        }
+    })();
+</script>
